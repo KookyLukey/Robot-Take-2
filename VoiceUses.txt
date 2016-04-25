@@ -1,0 +1,50 @@
+     private TextToSpeech TTS;
+ 
+        TTS = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int arg0) {
+                if (arg0 == TextToSpeech.SUCCESS) {
+                    TTS.setLanguage(Locale.US);
+                } else {
+
+                }
+            }
+        });
+
+        btnBeerSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+                startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+            }
+        });
+    }
+
+    public void onInit(int initStatus) {
+        if (initStatus == TextToSpeech.SUCCESS) {
+            TTS.setLanguage(Locale.US);
+        }
+        else if (initStatus == TextToSpeech.ERROR) {
+
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+        Intent data) {
+    if (requestCode == VOICE_RECOGNITION_REQUEST_CODE) {
+        List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+        String spokenText = results.get(0);
+        // Do something with spokenText
+        tv.append(spokenText + " ");
+        TTS.speak(spokenText, TextToSpeech.QUEUE_FLUSH, null);
+        if (spokenText.equals("go forward")) {
+            tv.append("Moving Forward");
+            TTS.speak("Moving forward with your command", TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+    super.onActivityResult(requestCode, resultCode, data);
+    }
